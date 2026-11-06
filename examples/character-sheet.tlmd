@@ -1,0 +1,185 @@
+{MAX_HP=51}
+{HP=51}
+{TEMP_HP=0}
+
+{AC_BONUS=0}
+{SPEED=30}
+
+{STRENGTH=10}
+{DEXTERITY=18}
+{CONSTITUTION=16}
+{WISDOM=12}
+{INTELLIGENCE=13}
+{CHARISMA=14}
+
+{PROF=3}
+
+{FEAT_ALERT=true}
+
+{STRENGTH_SAVE=""}
+{DEXTERITY_SAVE="proficiency"}
+{CONSTITUTION_SAVE="proficiency"}
+{WISDOM_SAVE=""}
+{INTELLIGENCE_SAVE=""}
+{CHARISMA_SAVE=""}
+
+{ATHLETICS=""}
+{ACROBATICS="expertise"}
+{SLEIGHT_OF_HAND="expertise"}
+{STEALTH="expertise"}
+{ANIMAL_HANDLING=""}
+{INSIGHT="proficiency"}
+{MEDICINE=""}
+{PERCEPTION="expertise"}
+{SURVIVAL=""}
+{ARCANA=""}
+{HISTORY=""}
+{INVESTIGATION="expertise"}
+{DECEPTION="proficiency"}
+{INTIMIDATION=""}
+{PERFORMANCE=""}
+{PERSUASION=""}
+
+
+
+
+
+{STR=floor((STRENGTH-10)/2)}
+{DEX=floor((DEXTERITY-10)/2)}
+{CON=floor((CONSTITUTION-10)/2)}
+{WIS=floor((WISDOM-10)/2)}
+{INT=floor((INTELLIGENCE-10)/2)}
+{CHA=floor((CHARISMA-10)/2)}
+
+{STRENGTH_SAVE_DOT=ifelse(STRENGTH_SAVE=="proficiency","*",ifelse(STRENGTH_SAVE=="expertise","!","o"))}
+{DEXTERITY_SAVE_DOT=ifelse(DEXTERITY_SAVE=="proficiency","*",ifelse(DEXTERITY_SAVE=="expertise","!","o"))}
+{CONSTITUTION_SAVE_DOT=ifelse(CONSTITUTION_SAVE=="proficiency","*",ifelse(CONSTITUTION_SAVE=="expertise","!","o"))}
+{WISDOM_SAVE_DOT=ifelse(WISDOM_SAVE=="proficiency","*",ifelse(WISDOM_SAVE=="expertise","!","o"))}
+{INTELLIGENCE_SAVE_DOT=ifelse(INTELLIGENCE_SAVE=="proficiency","*",ifelse(INTELLIGENCE_SAVE=="expertise","!","o"))}
+{CHARISMA_SAVE_DOT=ifelse(CHARISMA_SAVE=="proficiency","*",ifelse(CHARISMA_SAVE=="expertise","!","o"))}
+
+{STRENGTH_SAVE_MUL=PROF*ifelse(STRENGTH_SAVE=="proficiency",1,ifelse(STRENGTH_SAVE=="expertise",2,0))}
+{DEXTERITY_SAVE_MUL=PROF*ifelse(DEXTERITY_SAVE=="proficiency",1,ifelse(DEXTERITY_SAVE=="expertise",2,0))}
+{CONSTITUTION_SAVE_MUL=PROF*ifelse(CONSTITUTION_SAVE=="proficiency",1,ifelse(CONSTITUTION_SAVE=="expertise",2,0))}
+{WISDOM_SAVE_MUL=PROF*ifelse(WISDOM_SAVE=="proficiency",1,ifelse(WISDOM_SAVE=="expertise",2,0))}
+{INTELLIGENCE_SAVE_MUL=PROF*ifelse(INTELLIGENCE_SAVE=="proficiency",1,ifelse(INTELLIGENCE_SAVE=="expertise",2,0))}
+{CHARISMA_SAVE_MUL=PROF*ifelse(CHARISMA_SAVE=="proficiency",1,ifelse(CHARISMA_SAVE=="expertise",2,0))}
+
+{ATHLETICS_MUL=PROF*ifelse(ATHLETICS=="proficiency",1,ifelse(ATHLETICS=="expertise",2,0))}
+{ACROBATICS_MUL=PROF*ifelse(ACROBATICS=="proficiency",1,ifelse(ACROBATICS=="expertise",2,0))}
+{SLEIGHT_OF_HAND_MUL=PROF*ifelse(SLEIGHT_OF_HAND=="proficiency",1,ifelse(SLEIGHT_OF_HAND=="expertise",2,0))}
+{STEALTH_MUL=PROF*ifelse(STEALTH=="proficiency",1,ifelse(STEALTH=="expertise",2,0))}
+{ANIMAL_HANDLING_MUL=PROF*ifelse(ANIMAL_HANDLING=="proficiency",1,ifelse(ANIMAL_HANDLING=="expertise",2,0))}
+{INSIGHT_MUL=PROF*ifelse(INSIGHT=="proficiency",1,ifelse(INSIGHT=="expertise",2,0))}
+{MEDICINE_MUL=PROF*ifelse(MEDICINE=="proficiency",1,ifelse(MEDICINE=="expertise",2,0))}
+{PERCEPTION_MUL=PROF*ifelse(PERCEPTION=="proficiency",1,ifelse(PERCEPTION=="expertise",2,0))}
+{SURVIVAL_MUL=PROF*ifelse(SURVIVAL=="proficiency",1,ifelse(SURVIVAL=="expertise",2,0))}
+{ARCANA_MUL=PROF*ifelse(ARCANA=="proficiency",1,ifelse(ARCANA=="expertise",2,0))}
+{HISTORY_MUL=PROF*ifelse(HISTORY=="proficiency",1,ifelse(HISTORY=="expertise",2,0))}
+{INVESTIGATION_MUL=PROF*ifelse(INVESTIGATION=="proficiency",1,ifelse(INVESTIGATION=="expertise",2,0))}
+{DECEPTION_MUL=PROF*ifelse(DECEPTION=="proficiency",1,ifelse(DECEPTION=="expertise",2,0))}
+{INTIMIDATION_MUL=PROF*ifelse(INTIMIDATION=="proficiency",1,ifelse(INTIMIDATION=="expertise",2,0))}
+{PERFORMANCE_MUL=PROF*ifelse(PERFORMANCE=="proficiency",1,ifelse(PERFORMANCE=="expertise",2,0))}
+{PERSUASION_MUL=PROF*ifelse(PERSUASION=="proficiency",1,ifelse(PERSUASION=="expertise",2,0))}
+
+{ATHLETICS_DOT=ifelse(ATHLETICS=="proficiency","*",ifelse(ATHLETICS=="expertise","!","o"))}
+{ACROBATICS_DOT=ifelse(ACROBATICS=="proficiency","*",ifelse(ACROBATICS=="expertise","!","o"))}
+{SLEIGHT_OF_HAND_DOT=ifelse(SLEIGHT_OF_HAND=="proficiency","*",ifelse(SLEIGHT_OF_HAND=="expertise","!","o"))}
+{STEALTH_DOT=ifelse(STEALTH=="proficiency","*",ifelse(STEALTH=="expertise","!","o"))}
+{ANIMAL_HANDLING_DOT=ifelse(ANIMAL_HANDLING=="proficiency","*",ifelse(ANIMAL_HANDLING=="expertise","!","o"))}
+{INSIGHT_DOT=ifelse(INSIGHT=="proficiency","*",ifelse(INSIGHT=="expertise","!","o"))}
+{MEDICINE_DOT=ifelse(MEDICINE=="proficiency","*",ifelse(MEDICINE=="expertise","!","o"))}
+{PERCEPTION_DOT=ifelse(PERCEPTION=="proficiency","*",ifelse(PERCEPTION=="expertise","!","o"))}
+{SURVIVAL_DOT=ifelse(SURVIVAL=="proficiency","*",ifelse(SURVIVAL=="expertise","!","o"))}
+{ARCANA_DOT=ifelse(ARCANA=="proficiency","*",ifelse(ARCANA=="expertise","!","o"))}
+{HISTORY_DOT=ifelse(HISTORY=="proficiency","*",ifelse(HISTORY=="expertise","!","o"))}
+{INVESTIGATION_DOT=ifelse(INVESTIGATION=="proficiency","*",ifelse(INVESTIGATION=="expertise","!","o"))}
+{DECEPTION_DOT=ifelse(DECEPTION=="proficiency","*",ifelse(DECEPTION=="expertise","!","o"))}
+{INTIMIDATION_DOT=ifelse(INTIMIDATION=="proficiency","*",ifelse(INTIMIDATION=="expertise","!","o"))}
+{PERFORMANCE_DOT=ifelse(PERFORMANCE=="proficiency","*",ifelse(PERFORMANCE=="expertise","!","o"))}
+{PERSUASION_DOT=ifelse(PERSUASION=="proficiency","*",ifelse(PERSUASION=="expertise","!","o"))}
+
+
+
+
+
+@align(center, center)
+[
+  [
+    Dakhal Voramel
+    > -----
+  ]
+
+  @align(top) @gap(3)
+  [
+    -----
+    
+    @align(,edges)
+      [
+        STRENGTH|
+        {STRENGTH}({ifelse(STR>=0,"+","")}{STR})|
+        [{STRENGTH_SAVE_DOT} Saving Throw|{STR+STRENGTH_SAVE_MUL}]|
+        [{ATHLETICS_DOT} Athletics|{STR+ATHLETICS_MUL}]
+      ]
+    |@align(,edges)
+      [
+        DEXTERITY|
+        {DEXTERITY}({ifelse(DEX>=0,"+","")}{DEX})|
+        [{DEXTERITY_SAVE_DOT} Saving Throw|{DEX+STRENGTH_SAVE_MUL}]|
+        [{ACROBATICS_DOT} Acrobatics|{DEX+ACROBATICS_MUL}]|
+        [{SLEIGHT_OF_HAND_DOT} Sleight of Hand|{DEX+SLEIGHT_OF_HAND_MUL}]|
+        [{STEALTH_DOT} Stealth|{DEX+STEALTH_MUL}]
+      ]
+    |@align(,edges)
+      [
+        CONSTITUTION|
+        {CONSTITUTION}({ifelse(CON>=0,"+","")}{CON})|
+        [{CONSTITUTION_SAVE_DOT} Saving Throw|{CON+STRENGTH_SAVE_MUL}]
+      ]
+      
+
+    @align(,edges)
+      [
+        WISDOM|
+        {WISDOM}({ifelse(WIS>=0,"+","")}{WIS})|
+        [{WISDOM_SAVE_DOT} Saving Throw|{WIS+STRENGTH_SAVE_MUL}]|
+        [{ANIMAL_HANDLING_DOT} Animal Handling|{WIS+ANIMAL_HANDLING_MUL}]|
+        [{INSIGHT_DOT} Insight|{WIS+INSIGHT_MUL}]|
+        [{MEDICINE_DOT} Medicine|{WIS+MEDICINE_MUL}]|
+        [{PERCEPTION_DOT} Perception|{WIS+PERCEPTION_MUL}]|
+        [{SURVIVAL_DOT} Survival|{WIS+SURVIVAL_MUL}]
+      ]
+    |@align(,edges)
+      [
+        INTELLIGENCE|
+        {INTELLIGENCE}({ifelse(INT>=0,"+","")}{INT})|
+        [{INTELLIGENCE_SAVE_DOT} Saving Throw|{INT+STRENGTH_SAVE_MUL}]|
+        [{ARCANA_DOT} Arcana|{INT+ARCANA_MUL}]|
+        [{HISTORY_DOT} History|{INT+HISTORY_MUL}]|
+        [{INVESTIGATION_DOT} Investigation|{INT+INVESTIGATION_MUL}]
+      ]
+    |@align(,edges)
+      [
+        CHARISMA|
+        {CHARISMA}({ifelse(CHA>=0,"+","")}{CHA})|
+        [{CHARISMA_SAVE_DOT} Saving Throw|{CHA+STRENGTH_SAVE_MUL}]|
+        [{DECEPTION_DOT} Deception|{CHA+DECEPTION_MUL}]|
+        [{INTIMIDATION_DOT} Intimidation|{CHA+INTIMIDATION_MUL}]|
+        [{PERFORMANCE_DOT} Performance|{CHA+PERFORMANCE_MUL}]|
+        [{PERSUASION_DOT} Persuasion|{CHA+PERSUASION_MUL}]
+      ]
+
+      -----
+  ]
+
+
+
+  @gap(3)
+  [
+    HP (Max) | HP | Temp HP
+    > {MAX_HP} | {ifelse(HP>MAX_HP,MAX_HP,ifelse(HP<=0,0,HP))} | {ifelse(TEMP_HP<0,0,TEMP_HP)}
+    > -----
+    > AC | Initiative | Speed
+    > {10+DEX+AC_BONUS} | {DEX+ifelse(FEAT_ALERT,PROF,0)} | {SPEED}
+  ]
+]

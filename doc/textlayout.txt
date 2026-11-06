@@ -1,0 +1,306 @@
+*textlayout.txt*   A plain-text layout engine with a live preview
+
+==============================================================================
+CONTENTS                                                    *textlayout*
+
+    1. Introduction ................ |textlayout-introduction|
+    2. Syntax ...................... |textlayout-syntax|
+    3. Meta-text ................... |textlayout-meta|
+    4. Fitting the pane ............ |textlayout-fitting|
+    5. In-place rendering .......... |textlayout-inline|
+    6. Commands .................... |textlayout-commands|
+    7. Configuration ............... |textlayout-config|
+    8. Lua API ..................... |textlayout-api|
+
+==============================================================================
+1. INTRODUCTION                                     *textlayout-introduction*
+
+textlayout renders plain-text documents that look like markdown into a
+preview pane that always fits the window.  Rows stack, columns sit side by
+side, grids are shrunk to fit, and `{meta}` groups evaluate expressions and
+variables.
+
+Files are detected by the `.tl` and `.tlayout` extensions and use the
+`textlayout` filetype.  The `.tlmd` extension renders in place instead of in
+a pane; see |textlayout-inline|.
+
+==============================================================================
+2. SYNTAX                                                   *textlayout-syntax*
+
+    newline         joins the two lines with a space; a break is written,
+                    never implied
+    >               next row (or next column); must be the first non-blank
+                    character of its line
+    blank line      the same thing as a line holding nothing but >: a blank row
+    |               next column; the separator of a row layer
+    [ ... ]         open/close a deeper layer; the layer is the opposite
+                    kind of the layer that contains it
+    @row [ ... ]    force that layer to be a row: its | cells sit side by side
+    @col [ ... ]    force that layer to be a column: everything inside stacks
+    @grid [ ... ]    force that layer to be a grid: its cells line up in rows
+                    and columns
+    @name(arg)      layout directive for the group or row that follows
+    { ... }         meta-text
+    \               escape the next character (\| \[ \{ or \> for a break)
+
+The document root is a row (a flow), so `|` starts the next cell of the
+current line and a `>` at the start of a line opens the next row; a line
+containing `|` becomes a row of columns, and consecutive such lines share
+their column widths.  A break is written, never implied: lines run together
+until a `>` or a blank line starts a new row, which is what keeps a wrapped
+sentence from breaking in the middle of the preview.  A `>` must be the first
+non-whitespace character of its line, whitespace after it is padding, and a
+`>` anywhere else is ordinary text (`\>` writes one).  Every row after the
+first therefore opens with `>`.  A blank line and a line holding nothing but
+`>` mean the same thing: an empty row.
+
+Layers alternate: a `[ ... ]` layer is the opposite kind of the layer that
+contains it, so a layer inside a row stacks -- inside it a `>` and a `|` both
+separate stacked items -- and a layer inside that one flows again.  Write
+`@row`, `@col` or `@grid` in front of the `[` -- or as the first thing inside
+it -- to force the kind.  Anywhere else the same words are ordinary text, so
+prose can mention them.
+
+A `@grid [ ... ]` layer lays its cells out in rows and columns that line up all
+the way down: `|` starts the next cell of the current row and a `>` or a blank
+line starts the next row, and every row is padded out to the widest one, so the
+grid keeps its shape.  The rows and columns are worked out from what you write,
+so there is no count to get right.  A `[ ... ]` subdivision inside a cell lays
+out normally -- alternating row and column like any other layer -- unless it is
+a `@grid` too.  On a grid `@align` is about the cells: the vertical value
+places a short cell's text inside its row and the horizontal one places it
+inside its column, so grids start out `@align(top, center)`.  `edges` still
+spreads the columns to the edges of the width the grid was given.
+
+Whitespace around text is not content: padding at the start or end of a line
+or a cell is trimmed, including when the item beside it was a `{X=1}` that
+rendered nothing.  Whitespace between two pieces of text is kept exactly as
+written, so `Hello [world]` keeps its space and `a   b` keeps its run.  An
+empty cell is not content either, so a column nothing uses takes no room.
+Consecutive `|` rows share column widths so they line up like a table; a
+blank line ends the run, and `align_columns = false` disables the grouping.
+A cell sits in the centre of its column by default (headers included); the
+columns themselves do not move, only the text inside them, so
+`cell_align = "left"` gives you the plain table look back and
+`cell_align = "right"` is there for numbers.
+
+Common leading indentation is removed from the whole document.  A line that
+carries nothing but directives, or nothing but a `{X=1}` definition, is
+invisible: it starts no row of its own and leaves the rows around it alone,
+and a line that is nothing but meta evaluating to nothing (a bare `{X=1}`) is
+dropped instead of leaving a blank line, taking its neighbouring blank lines
+with it.  Blank lines at the very start or end of the document are trimmed
+(see trim_blank_edges in |textlayout-config|).
+
+A cell that is nothing but a run of the rule character -- five dashes by
+default -- is a rule: it draws across whatever contains it, a horizontal line
+as wide as that group inside a column and a vertical divider inside a row, and
+it never widens the block.  Rules are drawn with box-drawing characters and
+their crossings are joined up; `rules = "ascii"` keeps the dashes and pipes
+as written.
+
+==============================================================================
+3. META-TEXT                                                 *textlayout-meta*
+
+Examples: >
+
+    {1+1}                              -> 2
+    {"hello "+"world"}                 -> hello world
+    {DEXTERITY=14}                     defines a variable, renders nothing
+    {DEX=floor((DEXTERITY-10)/2)}      derived variable
+    {NAME="Bob"}                       string variable
+    {DEX+PROF+1}                       display
+    {X=1; X*2}                         statements, last value renders
+<
+
+Operators: `+ - * / % ^`, unary `-`, `== ~= < <= > >=`, `and`, `or`, `not`,
+and `..`.  `+` concatenates when either side is a string.
+
+Built-ins: floor ceil round abs sign sqrt pow clamp min max len upper lower
+str num ifelse rep pad.
+
+A group that fails to evaluate -- an unknown variable, a broken expression,
+a definition that does not parse -- renders as `#UNDEF` where it was written
+(see the `undef` option in textlayout-config).  Syntax the parser cannot
+identify, such as an unterminated `{` or a half-written `@grid [`, is shown
+exactly as written.
+
+Rendering never fails and never interrupts: if something unexpected goes
+wrong the pane falls back to the text as it is.
+
+==============================================================================
+4. FITTING THE PANE                                       *textlayout-fitting*
+
+Content narrower than the pane is centred horizontally.  A grid wider than
+the pane is shrunk: column widths are distributed proportionally, never
+below one column each, and cell text is cut with the ellipsis character.
+Every grid row keeps the same width, so the grid keeps its shape.
+
+Prose wider than the pane is truncated by default; set `overflow = "wrap"`
+to wrap it instead.  Trailing padding is stripped from the output.
+
+Use |:TextLayoutExport| to see the document at its natural width.
+
+==============================================================================
+5. IN-PLACE RENDERING                                   *textlayout-inline*
+
+A `.tlmd` file is laid out in its own window rather than in a floating pane.
+
+Nothing switches by itself.  Press the toggle key -- `<leader>tp` by default,
+see `inline.toggle_key` -- in NORMAL mode to flip between the two ways of
+reading a document:
+
+    preview                 one window, the whole layout
+    split                   the real text, with the layout live in a pane
+                            beside it
+
+The cursor is kept on the line you were on through every step: the source
+line that produced the rendered line you were reading, and back again.  Read
+the layout full width, press once for text with a live preview, press again
+to go back to reading.
+
+The pane is as wide as the layout needs, leaving at least 20 columns of text;
+`inline.split_width` pins it and `inline.split_side = "left"` opens it on the
+other side.
+
+Your file buffer is never rewritten.  The preview lives in a hidden sibling
+scratch buffer that is swapped into the window, so undo, `:w`, LSP, git
+signs and autosave plugins keep seeing the text you actually wrote.  `:w`
+from the preview writes the source text, never the layout.
+
+The preview buffer is not modifiable: no editing keys are intercepted,
+nothing is replayed, and every mode keeps its ordinary meaning.  The preview
+re-renders when the source changes and re-fits itself when the window is
+resized.
+
+Sessions keep the two apart.  A preview is a scratch buffer, so `:mksession`
+never records it as if it were a document: a window that was showing the layout
+comes back with its document, and the layout is opened again on top of it.  A
+session saved with the preview on screen opens with the preview, one saved with
+the text opens with the text, and one saved with both opens with both.  Neovim
+does not save floating windows at all, so a floating preview is never part of a
+session -- reopen it with |:TextLayout|.
+
+Because it re-renders on every keystroke a half-typed document is never an
+error: it renders as much as it can, shows `#UNDEF` where a group could not
+be evaluated, and renders anything else exactly as written.  Nothing is ever
+raised out of the pane; the warnings behind a render are kept for
+`require("textlayout.inline").warnings(bufnr)` instead of being shown.
+
+:TextLayout raw                                         *:TextLayout-raw*
+:TextLayout inline                                   *:TextLayout-inline*
+:TextLayout split                                   *:TextLayout-split*
+:TextLayout swap                                     *:TextLayout-swap*
+:TextLayout status                                 *:TextLayout-status*
+    Show the real text (closing the pane beside it), show the laid-out
+    preview on its own, show the preview in a pane beside the text, flip
+    between the two (the toggle key), or report whether the window is
+    `off`, showing `text`, showing the `preview` or arranged as a `split`.
+
+==============================================================================
+6. COMMANDS                                             *textlayout-commands*
+
+:TextLayout [sub]                                       *:TextLayout*
+    Open, close or refresh the preview.  `sub` is one of open, close,
+    toggle (default), refresh, focus, unfocus, export, reset, inline, raw,
+    split, swap, status.  The last five control in-place rendering
+    (|textlayout-inline|).
+
+    Opening leaves the cursor in the document.  Use `focus` to move the
+    cursor into the pane, and `unfocus` (or just closing it) to come back.
+
+:TextLayoutExport                                   *:TextLayoutExport*
+    Render the current buffer at its natural width into a scratch buffer.
+
+In the preview window, `q` and `<Esc>` close it, `r` refreshes it and `s`
+returns to the document without closing the pane.
+
+==============================================================================
+7. CONFIGURATION                                        *textlayout-config*
+
+>lua
+    require("textlayout").setup({
+      width = nil,            -- pane width; nil = preview window width
+      gap = 1,                -- columns between cells and grid columns
+      align_columns = true,   -- consecutive rows share column widths
+      justify = nil,          -- nil centres the document; "left" | "center" | "right" | "edges"
+      rules = "unicode",      -- "unicode" | "ascii" for ----- rules
+      align = "top",          -- "top" | "center" | "bottom"
+      cell_align = "center",  -- "left" | "center" | "right" in a column
+      ellipsis = "…",
+      undef = "#UNDEF",         -- what a failed { ... } renders as
+      overflow = "truncate",  -- "truncate" | "wrap"
+      dedent = true,
+      trim_trailing = true,
+      tabstop = 4,
+      drop_empty_meta_lines = true,
+      trim_blank_edges = true,
+      symbols = {             -- override any sigil
+        col_sep = "|", rule = "-----", next = ">", open = "[",
+        close = "]", escape = "\\", meta_open = "{", meta_close = "}",
+        directive = "@",
+      },
+      env = {},               -- variables available to every document
+      inline = {
+        enabled = true,
+        filetypes = { "tlmd" },   -- filetypes that render in place
+        toggle_key = "<leader>tp",-- swaps preview <-> split
+        width = nil,              -- nil = the width of the window
+        split_width = nil,        -- nil = as wide as the layout needs
+        split_side = "right",     -- "right" | "left"
+        render_filetype = "textlayout",
+      },
+      preview = {
+        mode = "float",       -- "float" | "split"
+        width = nil,
+        border = "rounded",
+        title = " textlayout ",
+        close_keys = { "q", "<Esc>" },
+        enter = false,
+        refresh_on = { "TextChanged", "TextChangedI", "TextChangedP",
+                       "BufWritePost" },
+        debounce = 80,
+      },
+    })
+<
+
+==============================================================================
+8. LUA API                                                 *textlayout-api*
+
+>lua
+    local tl = require("textlayout")
+
+    local result = tl.render(source, { width = 60 })
+    result.lines          -- fitted, centred lines
+    result.warnings       -- list of warning strings
+    result.natural_width  -- width before shrinking
+    result.line_map       -- line_map[i] = the source line behind line i
+
+    tl.render_natural(source)
+    tl.render_file(path, opts)
+    tl.render_buffer(bufnr, opts)
+<
+The preview module is available as `require("textlayout.preview")` with
+`open`, `focus`, `unfocus`, `close`, `toggle`, `refresh`, `export`,
+`reset`, `is_open`, `win_for` and `buf_for`.  `open(bufnr, { enter = true })`
+opens and focuses in one step.
+
+The in-place renderer is `require("textlayout.inline")` with `attach`,
+`detach`, `open`, `close`, `split`, `toggle`, `show`, `hide`, `sync`,
+`resize_all`, `status`, `arrangement`, `is_preview`, `split_windows`,
+`session`, `resolve`, `write_source`, `handles`, `detach_all` and
+`restore_window` (with `begin_session_load`, `end_session_load` and
+`attach_restored` for a session load).  `open`, `close`, `split` and
+`toggle` act on the current window; `open` and `close` return `"preview"` or
+`"text"`, `split` returns the new preview window, and `toggle` returns
+`"preview"` or `"split"`.  `status(win)` reports what a window is showing
+(`"off"`, `"text"` or `"preview"`) and `arrangement(win)` reports how the
+document is laid out (`"off"`, `"text"`, `"preview"` or `"split"`).
+
+Sessions are kept apart by `require("textlayout.session")`, which the plugin
+installs: `setup()` adds the SessionLoadPre/SessionLoadPost autocommands,
+`source_of(buf)` reports the document a preview buffer stands for, and
+`restore()` puts the documents back in the windows a session restored and
+returns the number of windows that are showing a layout again.
+
+vim:tw=78:ts=8:ft=help:norl:

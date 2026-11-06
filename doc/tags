@@ -1,0 +1,17 @@
+:TextLayout	textlayout.txt	/*:TextLayout*
+:TextLayout-inline	textlayout.txt	/*:TextLayout-inline*
+:TextLayout-raw	textlayout.txt	/*:TextLayout-raw*
+:TextLayout-split	textlayout.txt	/*:TextLayout-split*
+:TextLayout-status	textlayout.txt	/*:TextLayout-status*
+:TextLayout-swap	textlayout.txt	/*:TextLayout-swap*
+:TextLayoutExport	textlayout.txt	/*:TextLayoutExport*
+textlayout	textlayout.txt	/*textlayout*
+textlayout-api	textlayout.txt	/*textlayout-api*
+textlayout-commands	textlayout.txt	/*textlayout-commands*
+textlayout-config	textlayout.txt	/*textlayout-config*
+textlayout-fitting	textlayout.txt	/*textlayout-fitting*
+textlayout-inline	textlayout.txt	/*textlayout-inline*
+textlayout-introduction	textlayout.txt	/*textlayout-introduction*
+textlayout-meta	textlayout.txt	/*textlayout-meta*
+textlayout-syntax	textlayout.txt	/*textlayout-syntax*
+textlayout.txt	textlayout.txt	/*textlayout.txt*
